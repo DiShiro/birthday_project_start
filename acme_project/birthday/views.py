@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import BirthdayForm
@@ -16,7 +17,6 @@ def birthday(request, pk=None):
         files=request.FILES or None,
         instance=instance
     )
-    
     context = {'form': form}
 
     if form.is_valid():
@@ -30,8 +30,11 @@ def birthday(request, pk=None):
 
 
 def birthday_list(request):
-    birthdays = Birthday.objects.all()
-    context = {'birthdays': birthdays}
+    birthdays = Birthday.objects.order_by('id')
+    paginator = Paginator(birthdays, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {'page_obj': page_obj}
     return render(request, 'birthday/birthday_list.html', context)
 
 
